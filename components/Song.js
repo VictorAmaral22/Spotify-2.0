@@ -1,5 +1,6 @@
 import { useRecoilState } from "recoil";
-import { currentTrackIdState, isPlayingState } from "../atoms/songAtom";
+import { isPlayingState } from '../atoms/playlistAtom';
+import { currentTrackIdState } from "../atoms/songAtom";
 import useSpotify from "../hooks/useSpotify"
 import { millisToMinutesAndSeconds } from "../lib/time"
 
@@ -17,7 +18,7 @@ function Song({order, track}) {
     }
     
     return (
-        <div className="grid grid-cols-2 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg cursor-pointer"
+        <div className="grid grid-cols-2 text-gray-500 py-4 md:px-5 hover:bg-gray-900 rounded-lg cursor-pointer justify-between"
         onClick={playSong}>
             <div className="flex items-center space-x-4">
                 <p>{order + 1}</p>
@@ -30,7 +31,7 @@ function Song({order, track}) {
 
             <div className="flex items-center justify-between nl-auto md:ml-0">
                 <p className="w-40 hidden md:inline">{track.track.album.name}</p>
-                <p>{millisToMinutesAndSeconds(track.track.duration_ms)}</p>
+                <p className="">{millisToMinutesAndSeconds(track.track.duration_ms)}</p>
             </div>
         </div>
     )

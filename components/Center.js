@@ -26,7 +26,7 @@ export default function Center() {
 
     useEffect(() => {
         setColor(shuffle(colors).pop());
-    }, [playlistId]);
+    }, [playlistId, playlist]);
 
     useEffect(() => {
         spotifyApi.getPlaylist(playlistId).then((data) => {
@@ -48,7 +48,7 @@ export default function Center() {
             </header>
 
             <section className={`flex items-end space-x-7 bg-gradient-to-b to-black ${color} h-80 text-white p-8`}>
-                <img src={playlist?.images?.[0]?.url} alt="" className="" className="h-44 w-44 shadow-2xl"/>
+                <img src={playlist?.images?.[0]?.url} alt="" className="h-44 w-44 shadow-2xl"/>
                 <div>
                     <p>PLAYLIST</p>
                     <h1 className="text-2xl md:text-3xl xl:text-5xl font-bold">{playlist?.name}</h1>
