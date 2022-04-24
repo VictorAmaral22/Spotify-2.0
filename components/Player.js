@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import useSpotify from "../hooks/useSpotify";
-import { isPlayingState } from "../atoms/playlistAtom";
+import { isPlayingState, playlistIdState } from "../atoms/playlistAtom";
 import { currentTrackIdState } from "../atoms/songAtom";
 import { useRecoilState } from "recoil";
 import useSongInfo from "../hooks/useSongInfo";
@@ -14,33 +14,50 @@ function Player() {
     const spotifyApi = useSpotify();
     const { data: session, status } = useSession();
     const [currentTrackId, setCurrentTrackId] = useRecoilState(currentTrackIdState);
+    const [playlistId, setPlaylistIdS] = useRecoilState(playlistIdState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
     const [volume, setVolume] = useState(50);
-    const [switchingSongs, setSwitchingSongs] = useState(0);
 
-    const songInfo = useSongInfo(spotifyApi);
+    const [songInfo, setSongInfo] = useState(null);
+
+    useEffect(() => {
+      const fetchSongInfo = async () => {
+            if(currentTrackId) {
+                const trackInfo = await fetch(
+                    `https://api.spotify.com/v1/tracks/${currentTrackId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${spotifyApi.getAccessToken()}`
+                        }
+                    }
+                ).then((res) => res.json());
+
+                setSongInfo(trackInfo);
+            }
+      }
+
+      fetchSongInfo();
+    }, [currentTrackId, spotifyApi]);
 
     const fetchCurrentSong = () => {
-        spotifyApi.getMyCurrentPlayingTrack().then((data) => {
-            console.log('Now playing ',data.body?.item?.id)
-            setCurrentTrackId(data.body?.item?.id);
-            
-            spotifyApi.getMyCurrentPlaybackState().then((data) => {
-                setIsPlaying(data.body?.is_playing);
+        if(!songInfo){
+            spotifyApi.getMyCurrentPlayingTrack().then((data) => {
+                console.log('Now playing ',data.body?.item?.id)
+                setCurrentTrackId(data.body?.item?.id);
+                
+                spotifyApi.getMyCurrentPlaybackState().then((data) => {
+                    setIsPlaying(data.body?.is_playing);
+                })
             })
-        })
-
-        console.log('caralho ',currentTrackId);
+        }
     }
 
     const previousSong = () => {
         spotifyApi.skipToPrevious();
-        setSwitchingSongs(switchingSongs+1)
     }
 
     const nextSong = () => {
         spotifyApi.skipToNext();
-        setSwitchingSongs(switchingSongs+1);
     }
 
     const handlePlayPause = () => {
@@ -60,7 +77,7 @@ function Player() {
             fetchCurrentSong();
             setVolume(50);
         }
-    }, [currentTrackIdState, spotifyApi, session, switchingSongs])
+    }, [currentTrackId, spotifyApi, session])
 
     return (
         <div className="h-24 bg-gradient-to-b from-black to-gray-900 text-white grid-cols-3 text-xs md:text-base px-2 md:px-8 grid">
@@ -74,8 +91,8 @@ function Player() {
             </div>
 
             {/* Center */}
-            <div className="flex items-center justify-evenly">
-                <SwitchHorizontalIcon className="button" /> 
+            <div className="flex items-center justify-self-center justify-evenly w-2/3">
+                <SwitchHorizontalIcon className="small-button" /> 
 
                 <RewindIcon className="button" onClick={() => previousSong()} /> 
 
@@ -90,7 +107,7 @@ function Player() {
 
             {/* Right */}
             <div className="flex items-center space-x-3 md:space-x-4 justify-end">
-                <VolumeUpIcon className="button" />
+                <VolumeUpIcon className="small-button" />
                 <input type="range"  />
             </div>
         </div>
