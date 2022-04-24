@@ -64,9 +64,17 @@ function Sidebar() {
                 <hr className="border-t-[0.1px] border-gray-900"/>
 
                 {/* Playlists */}
-                {playlists.map((playlist) => (
-                    <p key={playlist.id} onClick={() => setPlaylistId(playlist.id)} className="cursor-pointer hover:text-white">{playlist.name}</p>
-                ))}
+                {playlists.map((playlist) => {
+                    return (
+                        <>
+                            {playlistId == playlist.id ? (
+                                <p key={playlist.id} onClick={() => setPlaylistId(playlist.id)} className="cursor-pointer text-green-600 hover:text-white">{playlist.name}</p>
+                            ) : (
+                                <p key={playlist.id} onClick={() => setPlaylistId(playlist.id)} className="cursor-pointer hover:text-white">{playlist.name}</p>
+                            )}
+                        </>
+                    )
+                })}
             </div>
         </div>
     )
