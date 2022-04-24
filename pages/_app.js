@@ -13,7 +13,7 @@ export default function MyApp({
     <SessionProvider session={session}>
       <RecoilRoot>
         <Head>
-          <title>Spotify 2.0</title>
+          <title>Spotify 2.1</title>
         </Head>
         <Component {...pageProps} />
       </RecoilRoot>
